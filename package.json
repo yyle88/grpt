@@ -1,0 +1,34 @@
+{
+  "name": "grpt",
+  "version": "0.0.0",
+  "description": "convert a TypeScript gRPC client into an HTTP client using Axios",
+  "main": "index.js",
+  "scripts": {
+    "demo": "echo 'vue3-kratos' && exit 0",
+    "test": "echo 'vue3-kratos' && exit 0"
+  },
+  "bin": {
+    "grpcrewrite": "./bin/grpcrewrite.js"
+  },
+  "type": "module",
+  "homepage": "https://github.com/yyle88/grpt",
+  "keywords": [
+    "protobuf-ts/plugin",
+    "Protocol Buffers",
+    "protobuf",
+    "TypeScript",
+    "protoc",
+    "bigint",
+    "gRPC-web",
+    "gRPC",
+    "Twirp",
+    "Reflection"
+  ],
+  "author": "yyle88",
+  "license": "MIT",
+  "dependencies": {
+    "@protobuf-ts/runtime-rpc": "^2.9.4",
+    "axios": "1.7.9",
+    "element-plus": "^2.9.4"
+  }
+}
