@@ -15,12 +15,12 @@ export function executeGrtp<I extends object, O extends object>(
     console.info('GRPC:', 'C:', callType, 'T:', transport, 'M:', method, 'O:', options, 'I:', input)
 
     const urxBase = options.baseUrl as string //目前是这样的
-    const apiHttp = method.options['google.api.http'] as JsonObject //目前是这样的
+    const httpConfig = method.options['google.api.http'] as JsonObject //目前是这样的
 
     const reqMethods = ['get', 'post', 'put', 'delete']
-    const httpMethod = Object.keys(apiHttp).find((key) => reqMethods.includes(key)) as string
+    const httpMethod = Object.keys(httpConfig).find((key) => reqMethods.includes(key)) as string
     if (!httpMethod) {
-        if (Object.keys(apiHttp).length === 0) {
+        if (Object.keys(httpConfig).length === 0) {
             const reason = '请求出错-在GRPC里没有找到补充定义的HTTP类型'
             ElMessage.error(reason)
             throw new Error(reason)
@@ -30,18 +30,18 @@ export function executeGrtp<I extends object, O extends object>(
             throw new Error(reason)
         }
     }
-    let uriPath = apiHttp[httpMethod] as string
+    let uriPath = httpConfig[httpMethod] as string
 
-    let httpParams: I = undefined
-    let httpDataXs: I = undefined
+    let queryParams: I | undefined = undefined
+    let requestBody: I | undefined = undefined
     //假如没有 body 属性，结果将是 undefined，而不会导致运行时错误
-    if (apiHttp.body == '*') {
-        httpDataXs = input
+    if (httpConfig.body == '*') {
+        requestBody = input
     } else {
         if (uriPath.includes('{') && uriPath.includes('}')) {
             uriPath = rewritePathParam(uriPath, input)
         } else {
-            httpParams = input
+            queryParams = input
         }
     }
     const urx = urxCombine(urxBase, uriPath)
@@ -49,8 +49,8 @@ export function executeGrtp<I extends object, O extends object>(
     const axiosConfig: AxiosRequestConfig = {
         method: httpMethod,
         url: urx,
-        params: httpParams, //当遇到get请求时-这样直接写上就行-也不用转成查询参数放在后面
-        data: httpDataXs,
+        params: queryParams, //当遇到get请求时-这样直接写上就行-也不用转成查询参数放在后面
+        data: requestBody,
         headers: options.meta, //这里好像两个数据都允许为空因为没有问题
     }
 
