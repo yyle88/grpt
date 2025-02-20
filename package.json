@@ -1,6 +1,6 @@
 {
   "name": "@yyle88/grpt",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "convert a TypeScript gRPC client into an HTTP client using Axios",
   "main": "index.js",
   "scripts": {
