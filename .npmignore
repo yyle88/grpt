@@ -4,3 +4,4 @@ node_modules/
 .gitignore
 tests/
 *.log
+package-lock.json

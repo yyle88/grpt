@@ -2,14 +2,19 @@
 
 import fs from 'fs'
 
+/**
+ * Rewrites the specified file by replacing gRPC calls with HTTP calls.
+ *
+ * @param {string} codePath - The path to the file to be rewritten.
+ */
 function rewrite(codePath) {
     if (!codePath) {
         console.error('没有路径参数-请设置文件路径.')
         return
     }
-    fs.readFile(codePath, 'utf8', (erx, data) => {
-        if (erx) {
-            console.error(`读取文件失败: ${erx}`)
+    fs.readFile(codePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`读取文件失败: ${err}`)
             return
         }
 
@@ -30,21 +35,30 @@ function rewrite(codePath) {
             }
         }
 
-        fs.writeFile(codePath, newContent, 'utf8', (erx) => {
-            if (erx) {
-                console.error(`写入文件失败: ${erx}`)
+        fs.writeFile(codePath, newContent, 'utf8', (err) => {
+            if (err) {
+                console.error(`写入文件失败: ${err}`)
                 return
             }
-            console.log('内容替换成功!')
+            console.debug('内容替换成功!')
         })
     })
 }
 
+// English Comments-英文注释:
+// -----------------
+// Execute the replacement logic
+// For example:
+// Running the command outside the project: npm run grpcrewrite -- /xxx/src/rpc/rpc_admin_login/admin_login.client.ts
+// will automatically modify the content of the specified file.
+// It will replace the gRPC request logic with HTTP request logic, ultimately using HTTP endpoints while keeping the gRPC parameters and return types.
+// Chinese Comments-中文注释:
+// ---------
 // 执行替换的逻辑
 // 比如
 // 在项目外侧执行: npm run grpcrewrite -- /xxx/src/rpc/rpc_admin_login/admin_login.client.ts
 // 就会自动修改这个文件的内容
-// 将会把里面的 grpc 请求逻辑替换为 http 请求逻辑，最终使用的是http的接口，grpc的参数和返回类型
+// 将会把里面的 gRPC 请求逻辑替换为 HTTP 请求逻辑，最终使用的是 HTTP 的接口，gRPC 的参数和返回类型
 const codePath = process.argv[2]
 if (codePath) {
     rewrite(codePath)
