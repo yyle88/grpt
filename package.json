@@ -1,6 +1,6 @@
 {
   "name": "@yyle88/grpt",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "convert a TypeScript gRPC client into an HTTP client using Axios",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,7 @@
   "dependencies": {
     "@protobuf-ts/runtime-rpc": "^2.9.6",
     "@types/node": "^22.13.14",
-    "axios": "1.8.4",
+    "axios": "^1.8.4",
     "element-plus": "^2.9.7"
   }
 }
