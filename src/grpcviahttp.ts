@@ -34,23 +34,23 @@ export function executeGrtp<I extends object, O extends object>(
 ): GrtpPromise<I, O> {
     console.debug('GRPC:', 'C:', callType, 'T:', transport, 'M:', method, 'O:', options, 'I:', input)
 
-    const urxBase = options.baseUrl as string //目前是这样的
-    const httpConfig = method.options['google.api.http'] as JsonObject //目前是这样的
+    const baseUrl = options['baseUrl'] as string; //目前是这样的
+    const apiHttp = method.options['google.api.http'] as JsonObject //目前是这样的
 
     const reqMethods = ['get', 'post', 'put', 'delete']
-    const httpMethod = Object.keys(httpConfig).find((key) => reqMethods.includes(key)) as string
+    const httpMethod = Object.keys(apiHttp).find((key) => reqMethods.includes(key)) as string
     if (!httpMethod) {
-        const reason = Object.keys(httpConfig).length === 0
+        const reason = Object.keys(apiHttp).length === 0
             ? 'Request error - No HTTP method defined in GRPC'
             : 'Request error - Non GET/POST/PUT/DELETE HTTP method defined in GRPC'
         ElMessage.error(reason)
         throw new Error(reason)
     }
-    let uriPath = httpConfig[httpMethod] as string
+    let uriPath = apiHttp[httpMethod] as string
 
     let queryParams: I | undefined = undefined
     let requestBody: I | undefined = undefined
-    if (httpConfig.body === '*') { //假如没有 body 属性，结果将是 undefined，这样它依然是不等于*的，而不会导致运行时报错
+    if (apiHttp.body === '*') { //假如没有 body 属性，结果将是 undefined，这样它依然是不等于*的，而不会导致运行时报错
         requestBody = input
     } else {
         if (uriPath.includes('{') && uriPath.includes('}')) {
@@ -59,12 +59,12 @@ export function executeGrtp<I extends object, O extends object>(
             queryParams = input
         }
     }
-    const urx = urxCombine(urxBase, uriPath)
-    console.debug(`Http Method: ${httpMethod}, Full URL: ${urx} (Base URL: ${urxBase}, Uri Path: ${uriPath})`)
+    const fullUrl = urlCombine(baseUrl, uriPath)
+    console.debug(`Http Method: ${httpMethod}, Full URL: ${fullUrl} (Base URL: ${baseUrl}, Uri Path: ${uriPath})`)
 
     const axiosConfig: AxiosRequestConfig = {
         method: httpMethod,
-        url: urx,
+        url: fullUrl,
         params: queryParams, //当遇到get请求时-这样直接写上就行-也不用转成查询参数放在后面
         data: requestBody,
         headers: options.meta, //这里好像两个数据都允许为空因为没有问题
@@ -116,14 +116,14 @@ function rewritePathParam<T extends object>(uriPath: string, input: T): string {
  * @param uri - The URI path to be appended to the base URL.
  * @returns The combined URL.
  */
-export function urxCombine(urb: string, uri: string): string {
-    let urx: string
+export function urlCombine(urb: string, uri: string): string {
+    let res: string
     if (urb.endsWith('/') || uri.startsWith('/')) {
-        urx = urb + uri
+        res = urb + uri
     } else {
-        urx = urb + '/' + uri
+        res = urb + '/' + uri
     }
-    return urx
+    return res
 }
 
 /**
