@@ -1,6 +1,7 @@
-import {RpcTransport, RpcOptions, MethodInfo} from '@protobuf-ts/runtime-rpc'
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
-import {JsonObject} from '@protobuf-ts/runtime/build/types/json-typings'
+import type {RpcTransport, RpcOptions, MethodInfo} from '@protobuf-ts/runtime-rpc'
+import axios from 'axios'
+import type {AxiosRequestConfig, AxiosResponse} from 'axios'
+import type {JsonObject} from '@protobuf-ts/runtime'
 import {ElMessage} from 'element-plus'
 
 /**
