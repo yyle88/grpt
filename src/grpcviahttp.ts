@@ -3,6 +3,7 @@ import axios from 'axios'
 import type {AxiosRequestConfig, AxiosResponse} from 'axios'
 import type {JsonObject} from '@protobuf-ts/runtime'
 import {ElMessage} from 'element-plus'
+import type {MessageParamsWithType} from 'element-plus'
 
 /**
  * Represents a promise that resolves to an Axios response containing the output-resp object.
@@ -41,11 +42,16 @@ export function executeGrtp<I extends object, O extends object>(
     const reqMethods = ['get', 'post', 'put', 'delete']
     const httpMethod = Object.keys(apiHttp).find((key) => reqMethods.includes(key)) as string
     if (!httpMethod) {
-        const reason = Object.keys(apiHttp).length === 0
+        const message = Object.keys(apiHttp).length === 0
             ? 'Request error - No HTTP method defined in GRPC'
             : 'Request error - Non GET/POST/PUT/DELETE HTTP method defined in GRPC'
-        ElMessage.error(reason)
-        throw new Error(reason)
+        ElMessage.error({
+            message: message,
+            type: 'error',
+            duration: 3000,
+            showClose: true,
+        } as unknown as MessageParamsWithType)
+        throw new Error(message)
     }
     let uriPath = apiHttp[httpMethod] as string
 
@@ -68,7 +74,7 @@ export function executeGrtp<I extends object, O extends object>(
         url: fullUrl,
         params: queryParams, //当遇到get请求时-这样直接写上就行-也不用转成查询参数放在后面
         data: requestBody,
-        headers: options.meta, //这里好像两个数据都允许为空因为没有问题
+        headers: options.meta ?? {}, //这里好像两个数据都允许为空因为没有问题
     }
 
     return axios.request<O, AxiosResponse<O, AxiosRequestConfig>>(axiosConfig)
@@ -89,21 +95,26 @@ function rewritePathParam<T extends object>(uriPath: string, input: T): string {
     if (params) {
         params.forEach((param) => {
             const paramName = param.slice(1, -1)
-            let value = input[paramName]
+            let value = (input as Record<string, unknown>)[paramName]
 
             if (value === undefined) {
                 // 尝试将蛇形命名法转换为小驼峰命名法(example_param_name->exampleParamName)
                 const newParamName = toCamelCase(paramName)
-                value = input[newParamName]
+                value = (input as Record<string, unknown>)[newParamName]
             }
 
             if (value === undefined) {
-                const reason = `MISSING PARAMETER: ${paramName}`
-                ElMessage.error(reason)
-                throw new Error(reason)
+                const message = `MISSING PARAMETER: ${paramName}`
+                ElMessage.error({
+                    message: message,
+                    type: 'error',
+                    duration: 3000,
+                    showClose: true,
+                } as unknown as MessageParamsWithType)
+                throw new Error(message)
             }
 
-            uriPath = uriPath.replace(param, encodeURIComponent(value))
+            uriPath = uriPath.replace(param, encodeURIComponent(String(value ?? '')))
         })
     }
     return uriPath
@@ -135,5 +146,5 @@ export function urlCombine(urb: string, uri: string): string {
  * @returns The converted camelCase string.
  */
 function toCamelCase(paramName: string): string {
-    return paramName.replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+    return paramName.replace(/_([a-z])/g, (g) => g[1]!.toUpperCase())
 }

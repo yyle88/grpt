@@ -1,6 +1,6 @@
 {
   "name": "@yyle88/grpt",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "convert a TypeScript gRPC client into an HTTP client using Axios",
   "main": "index.js",
   "scripts": {
@@ -31,5 +31,8 @@
     "@types/node": "^24.2.1",
     "axios": "^1.11.0",
     "element-plus": "^2.10.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
   }
 }
