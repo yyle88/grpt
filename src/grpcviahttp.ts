@@ -4,6 +4,7 @@ import type {AxiosRequestConfig, AxiosResponse} from 'axios'
 import type {JsonObject} from '@protobuf-ts/runtime'
 import {ElMessage} from 'element-plus'
 import type {MessageParamsWithType} from 'element-plus'
+import urlJoin from 'url-join';
 
 /**
  * Represents a promise that resolves to an Axios response containing the output-resp object.
@@ -66,7 +67,7 @@ export function executeGrtp<I extends object, O extends object>(
             queryParams = input
         }
     }
-    const fullUrl = urlCombine(baseUrl, uriPath)
+    const fullUrl = urlJoin(baseUrl, uriPath)
     console.debug(`Http Method: ${httpMethod}, Full URL: ${fullUrl} (Base URL: ${baseUrl}, Uri Path: ${uriPath})`)
 
     const axiosConfig: AxiosRequestConfig = {
@@ -118,24 +119,6 @@ function rewritePathParam<T extends object>(uriPath: string, input: T): string {
         })
     }
     return uriPath
-}
-
-/**
- * Combines a base URL and a URI path into a single URL.
- * Ensures that there is exactly one slash between the base URL and the URI path.
- *
- * @param urb - The base URL.
- * @param uri - The URI path to be appended to the base URL.
- * @returns The combined URL.
- */
-export function urlCombine(urb: string, uri: string): string {
-    let res: string
-    if (urb.endsWith('/') || uri.startsWith('/')) {
-        res = urb + uri
-    } else {
-        res = urb + '/' + uri
-    }
-    return res
 }
 
 /**

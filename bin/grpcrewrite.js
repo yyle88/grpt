@@ -22,7 +22,11 @@ function rewrite(codePath) {
         let newContent = data.replace(/stackIntercept</g, 'executeGrtp<').replace(/UnaryCall</g, 'GrtpPromise<')
 
         // 判断是否已经存在目标引用，当然假如将来这个文件路径会变的话还得修改这里的代码
-        const targetImport = "import { executeGrtp, GrtpPromise } from '@yyle88/grpt/src/grpcviahttp';"
+        const targetImport =
+            `import { executeGrtp } from '@yyle88/grpt/src/grpcviahttp';` +
+            "\n" +
+            `import type { GrtpPromise } from '@yyle88/grpt/src/grpcviahttp';`
+        // 把目标代码追加到这句的后面，因此需要在引用里找这句的位置
         const searchImport = 'import type { RpcOptions } from "@protobuf-ts/runtime-rpc";'
         if (!newContent.includes(targetImport)) {
             // 找到指定引用的位置
